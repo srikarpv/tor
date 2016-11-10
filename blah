@@ -1,0 +1,15 @@
+
+#!/usr/bin/env bash
+
+WATCH_PATH="~"
+IFS=";"
+
+inotifywait -rm --format "%w;%:e;%f" -e create -e moved_to ${WATCH_PATH} |
+while read path action file; do
+   echo "The file '$file' appeared in directory '$path' via '$action'"
+
+   if [[ "$file" == *".torrent" ]]; then
+      transmission-remote -s -w "$path" -a "$path/$file"
+      rm "$path/$file"
+   fi
+done
